@@ -1,6 +1,25 @@
-# SideSeat
+<h1 align="center">SideSeat</h1>
 
-In-app remote support for iOS. A support agent opens a web page, types the 6-digit code shown in your app, and sees the user's screen live. With the user's consent, the agent can also tap, scroll, type and go back.
+<p align="center">
+  <strong>In-app remote support for iOS.</strong><br>
+  See your user's screen and, with their consent, help them through it. No screen sharing app, no private APIs.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/iOS-15%2B-blue" alt="iOS 15+">
+  <img src="https://img.shields.io/badge/Swift-5.9-orange" alt="Swift 5.9">
+  <img src="https://img.shields.io/badge/SPM-compatible-brightgreen" alt="Swift Package Manager">
+  <img src="https://img.shields.io/badge/dependencies-none-lightgrey" alt="No dependencies">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License"></a>
+</p>
+
+<p align="center">
+  <img src="docs/hero.png" alt="An agent controlling the sample app from the web console, next to the user's iPhone" width="900">
+</p>
+
+A support agent opens a web page, types the 6-digit code shown in your app, and sees the user's screen live. With the user's consent, the agent can also tap, scroll, type and go back.
+
+## Features
 
 - **App Store safe.** Public APIs only. No touch synthesis, no private selectors. Agent input is replayed the way UIKit itself would handle it: control actions, table and collection selection through their delegates, popovers closing through their delegates, scroll offsets, text input.
 - **Consent first.** Nothing streams until the user allows viewing, or viewing and control. The user can drop to view-only or end the session at any time from a banner they can drag out of the way.
@@ -8,9 +27,9 @@ In-app remote support for iOS. A support agent opens a web page, types the 6-dig
 - **No dependencies.** About 2,000 lines of Swift. iOS 15+, UIKit and SwiftUI.
 - **Bring your own backend.** A small reference relay and agent console are included for local development. The transport is a protocol, so you can run sessions over your own infrastructure.
 
-| Agent console | User's device |
-| --- | --- |
-| ![Agent console](docs/console.jpg) | ![Consent](docs/consent.jpg) |
+| Pairing and consent | What the user sees vs. what the agent sees |
+| :---: | :---: |
+| <img src="docs/consent.jpg" alt="Support code and consent prompt" width="420"> | <img src="docs/masking.jpg" alt="Profile screen on the device next to the agent's view with the PIN and recovery key masked" width="420"> |
 
 ## Try it in two minutes
 
@@ -28,7 +47,13 @@ Click on the screen to tap, use the trackpad or wheel to scroll, and type with t
 
 ## Add it to your app
 
-Swift Package Manager: add this repository and the `SideSeat` product.
+Swift Package Manager: in Xcode choose **File › Add Package Dependencies…** and enter the repository URL, or add it to `Package.swift`:
+
+```swift
+.package(url: "https://github.com/mohameditani91/SideSeat.git", branch: "main")
+```
+
+Then add the `SideSeat` product to your target.
 
 ```swift
 import SideSeat
