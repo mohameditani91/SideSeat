@@ -20,12 +20,12 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 final class RootTabController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        let orders = UINavigationController(rootViewController: OrdersViewController())
-        orders.tabBarItem = UITabBarItem(title: "Orders", image: UIImage(systemName: "list.bullet.rectangle"), tag: 0)
+        let tasks = UINavigationController(rootViewController: TasksViewController())
+        tasks.tabBarItem = UITabBarItem(title: "Tasks", image: UIImage(systemName: "checklist"), tag: 0)
         let profile = ProfileHostingController()
         profile.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person.crop.circle"), tag: 1)
         let support = UINavigationController(rootViewController: SupportViewController())
         support.tabBarItem = UITabBarItem(title: "Support", image: UIImage(systemName: "person.wave.2"), tag: 2)
-        viewControllers = [orders, profile, support]
+        viewControllers = [tasks, profile, support]
     }
 }

@@ -9,15 +9,15 @@
 /* Begin PBXBuildFile section */
 		0B1B2D297AF8225E956C890F /* SupportViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC55961AA2B8A5B323DFEAF /* SupportViewController.swift */; };
 		335875B04A4A257E22D3F39D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B24E67CA62497884C4EF476 /* AppDelegate.swift */; };
+		87AED5DA8EDC6E047C83EDA8 /* TasksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EC8817C8DA82272518CD7A /* TasksViewController.swift */; };
 		B23E1C0C91DE03AD0846269B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053C258100E63F42794E10B9 /* ProfileView.swift */; };
 		D15533D2336DFBADA3739DCF /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97FB383D9BE4295C95934D41 /* Support.swift */; };
 		DE2999F6FB10010A085FECC2 /* SideSeat in Frameworks */ = {isa = PBXBuildFile; productRef = A19858D28DA82A03D144775E /* SideSeat */; };
-		FBC63D1F115E721689E7B0C1 /* OrdersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B62AAFAE892682A67933FC /* OrdersViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		053C258100E63F42794E10B9 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
-		46B62AAFAE892682A67933FC /* OrdersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersViewController.swift; sourceTree = "<group>"; };
+		22EC8817C8DA82272518CD7A /* TasksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksViewController.swift; sourceTree = "<group>"; };
 		5B24E67CA62497884C4EF476 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5BC55961AA2B8A5B323DFEAF /* SupportViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportViewController.swift; sourceTree = "<group>"; };
 		97FB383D9BE4295C95934D41 /* Support.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Support.swift; sourceTree = "<group>"; };
@@ -43,10 +43,10 @@
 			children = (
 				5B24E67CA62497884C4EF476 /* AppDelegate.swift */,
 				A9D7D9D82FDEFBEF2A468B1B /* Info.plist */,
-				46B62AAFAE892682A67933FC /* OrdersViewController.swift */,
 				053C258100E63F42794E10B9 /* ProfileView.swift */,
 				97FB383D9BE4295C95934D41 /* Support.swift */,
 				5BC55961AA2B8A5B323DFEAF /* SupportViewController.swift */,
+				22EC8817C8DA82272518CD7A /* TasksViewController.swift */,
 			);
 			path = SampleApp;
 			sourceTree = "<group>";
@@ -137,10 +137,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				335875B04A4A257E22D3F39D /* AppDelegate.swift in Sources */,
-				FBC63D1F115E721689E7B0C1 /* OrdersViewController.swift in Sources */,
 				B23E1C0C91DE03AD0846269B /* ProfileView.swift in Sources */,
 				D15533D2336DFBADA3739DCF /* Support.swift in Sources */,
 				0B1B2D297AF8225E956C890F /* SupportViewController.swift in Sources */,
+				87AED5DA8EDC6E047C83EDA8 /* TasksViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

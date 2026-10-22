@@ -14,7 +14,7 @@ enum Support {
         guard let url = URL(string: relay) else { return }
         var configuration = SideSeat.Configuration(relay: url)
         configuration.tint = .systemIndigo
-        configuration.maskRule = MaskRules.screens([CardDetailsViewController.self])
+        configuration.maskRule = MaskRules.screens([RecoveryKeyViewController.self])
         if let mode = UserDefaults.standard.string(forKey: "SideSeatAutoConsent").flatMap(SessionMode.init(rawValue:)) {
             configuration.consentHandler = { _, decide in decide(mode) }
         }

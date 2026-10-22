@@ -1,47 +1,47 @@
 import UIKit
 
-struct Order {
+struct Todo {
     let number: Int
-    let total: Double
-    var label: String { "Order #\(number)" }
-    var amount: String { String(format: "$%.2f", total) }
+    let hours: Int
+    var label: String { "Task #\(number)" }
+    var estimate: String { "\(hours)h" }
 }
 
-final class OrdersViewController: UITableViewController {
+final class TasksViewController: UITableViewController {
 
-    private let orders = (0..<40).map { Order(number: 1001 + $0, total: Double(($0 * 37) % 90) + 4.5) }
+    private let tasks = (0..<40).map { Todo(number: 1001 + $0, hours: ($0 * 7) % 12 + 1) }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Orders"
+        title = "Tasks"
         navigationController?.navigationBar.prefersLargeTitles = true
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        orders.count
+        tasks.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "order") ?? UITableViewCell(style: .value1, reuseIdentifier: "order")
-        cell.textLabel?.text = orders[indexPath.row].label
-        cell.detailTextLabel?.text = orders[indexPath.row].amount
+        let cell = tableView.dequeueReusableCell(withIdentifier: "task") ?? UITableViewCell(style: .value1, reuseIdentifier: "task")
+        cell.textLabel?.text = tasks[indexPath.row].label
+        cell.detailTextLabel?.text = tasks[indexPath.row].estimate
         cell.accessoryType = .disclosureIndicator
         return cell
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        navigationController?.pushViewController(OrderDetailViewController(order: orders[indexPath.row]), animated: true)
+        navigationController?.pushViewController(TaskDetailViewController(task: tasks[indexPath.row]), animated: true)
     }
 }
 
-final class OrderDetailViewController: UIViewController, UIPopoverPresentationControllerDelegate {
+final class TaskDetailViewController: UIViewController, UIPopoverPresentationControllerDelegate {
 
-    private let order: Order
+    private let task: Todo
     private let optionsButton = UIButton(configuration: .tinted())
     private let summary = UILabel()
 
-    init(order: Order) {
-        self.order = order
+    init(task: Todo) {
+        self.task = task
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -49,23 +49,23 @@ final class OrderDetailViewController: UIViewController, UIPopoverPresentationCo
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = order.label
+        title = task.label
         navigationItem.largeTitleDisplayMode = .never
         view.backgroundColor = .systemGroupedBackground
 
-        summary.text = "Total \(order.amount)"
+        summary.text = "Estimate \(task.estimate)"
         summary.font = .preferredFont(forTextStyle: .title2)
 
-        let paid = UISwitch()
-        paid.addAction(UIAction { [weak self] action in
-            self?.summary.text = "Total \(self?.order.amount ?? "")" + ((action.sender as? UISwitch)?.isOn == true ? " · Paid" : "")
+        let done = UISwitch()
+        done.addAction(UIAction { [weak self] action in
+            self?.summary.text = "Estimate \(self?.task.estimate ?? "")" + ((action.sender as? UISwitch)?.isOn == true ? " · Done" : "")
         }, for: .valueChanged)
 
-        let type = UISegmentedControl(items: ["Dine in", "Takeaway", "Delivery"])
-        type.selectedSegmentIndex = 0
+        let priority = UISegmentedControl(items: ["Low", "Medium", "High"])
+        priority.selectedSegmentIndex = 1
 
         let note = UITextField()
-        note.placeholder = "Note for the kitchen"
+        note.placeholder = "Add a comment"
         note.borderStyle = .roundedRect
         note.returnKeyType = .done
         note.addAction(UIAction { _ in note.resignFirstResponder() }, for: .editingDidEndOnExit)
@@ -75,13 +75,13 @@ final class OrderDetailViewController: UIViewController, UIPopoverPresentationCo
 
         let toast = UIButton(configuration: .tinted())
         toast.configuration?.title = "Save"
-        toast.addAction(UIAction { _ in Toast.show("Order saved") }, for: .touchUpInside)
+        toast.addAction(UIAction { _ in Toast.show("Task saved") }, for: .touchUpInside)
 
-        let card = UIButton(configuration: .plain())
-        card.configuration?.title = "Payment card details"
-        card.addAction(UIAction { [weak self] _ in self?.navigationController?.pushViewController(CardDetailsViewController(), animated: true) }, for: .touchUpInside)
+        let secret = UIButton(configuration: .plain())
+        secret.configuration?.title = "Recovery key"
+        secret.addAction(UIAction { [weak self] _ in self?.navigationController?.pushViewController(RecoveryKeyViewController(), animated: true) }, for: .touchUpInside)
 
-        let stack = UIStackView(arrangedSubviews: [summary, row("Paid", paid), type, note, optionsButton, toast, card])
+        let stack = UIStackView(arrangedSubviews: [summary, row("Done", done), priority, note, optionsButton, toast, secret])
         stack.axis = .vertical
         stack.spacing = 18
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -120,7 +120,7 @@ final class OrderDetailViewController: UIViewController, UIPopoverPresentationCo
 
 final class OptionsViewController: UITableViewController {
 
-    private let choices = ["No onions", "Extra spicy", "Gift wrap", "Call on arrival"]
+    private let choices = ["Remind me", "Flag", "Duplicate", "Move to next week"]
     private let onChoose: (String) -> Void
 
     init(onChoose: @escaping (String) -> Void) {
@@ -146,13 +146,13 @@ final class OptionsViewController: UITableViewController {
     }
 }
 
-final class CardDetailsViewController: UIViewController {
+final class RecoveryKeyViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Card"
+        title = "Recovery key"
         view.backgroundColor = .systemBackground
         let label = UILabel()
-        label.text = "4242 4242 4242 4242\nExp 12/29 · CVC 123"
+        label.text = "K7QD-29XF-M4LP\nRW8N-3HCT-V6ZB"
         label.numberOfLines = 0
         label.textAlignment = .center
         label.font = .monospacedDigitSystemFont(ofSize: 24, weight: .medium)

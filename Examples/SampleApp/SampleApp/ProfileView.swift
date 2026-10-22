@@ -43,13 +43,13 @@ struct ProfileView: View {
                 }
 
                 Section("Private") {
-                    Text("Card on file: 4242 4242 4242 4242")
+                    Text("Recovery key: K7QD-29XF-M4LP")
                         .sideSeatMasked()
                 }
 
                 Section("History") {
-                    ForEach(1...30, id: \.self) { visit in
-                        Text("Visit \(visit)")
+                    ForEach(1...30, id: \.self) { entry in
+                        Text("Sign-in \(entry)")
                     }
                 }
             }
