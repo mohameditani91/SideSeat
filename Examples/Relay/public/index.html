@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SideSeat Console</title>
+<style>
+  :root {
+    --bg: #f5f5f7; --panel: #ffffff; --text: #1d1d1f; --muted: #6e6e73; --line: #d9d9de;
+    --accent: #0a66ff; --good: #1f9d55; --warn: #b7791f; --bad: #d64545; --stage: #111114;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111114; --panel: #1c1c20; --text: #f2f2f5; --muted: #9a9aa3; --line: #2e2e34; --accent: #4d8dff; --stage: #000; }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: grid; grid-template-rows: auto 1fr; }
+  header { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  header h1 { font-size: 16px; margin: 0; font-weight: 650; }
+  .chip { font-size: 13px; padding: 3px 10px; border-radius: 999px; background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+  .chip[data-tone="good"] { color: var(--good); border-color: currentColor; }
+  .chip[data-tone="warn"] { color: var(--warn); border-color: currentColor; }
+  .chip[data-tone="bad"] { color: var(--bad); border-color: currentColor; }
+  .spacer { flex: 1; }
+  button { font: inherit; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); padding: 7px 14px; cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.danger { color: var(--bad); }
+  button:disabled { opacity: .45; cursor: default; }
+  main { display: grid; grid-template-columns: 1fr 320px; grid-template-rows: minmax(0, 1fr); min-height: 0; }
+  #stage { background: var(--stage); display: grid; place-items: center; min-height: 0; position: relative; overflow: hidden; }
+  #screen { position: absolute; inset: 0; margin: auto; max-width: calc(100% - 32px); max-height: calc(100% - 32px); width: auto; height: auto; border-radius: 12px; outline: none; background: #222; }
+  #screen.control { cursor: crosshair; }
+  #hint { position: absolute; color: #aaa; font-size: 14px; text-align: center; padding: 24px; }
+  aside { border-left: 1px solid var(--line); background: var(--panel); display: grid; grid-template-rows: auto 1fr; min-height: 0; }
+  aside h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 16px 16px 8px; }
+  #events { list-style: none; margin: 0; padding: 0 8px 16px; overflow: auto; }
+  #events li { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 8px; border-radius: 8px; font-size: 14px; }
+  #events li:nth-child(odd) { background: var(--bg); }
+  #events .result { color: var(--muted); text-align: right; }
+  #events .result[data-tone="good"] { color: var(--good); }
+  #events .result[data-tone="bad"] { color: var(--bad); }
+  dialog { border: none; border-radius: 18px; padding: 24px; width: min(360px, calc(100vw - 32px)); background: var(--panel); color: var(--text); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+  dialog::backdrop { background: rgba(0,0,0,.4); }
+  dialog h2 { margin: 0 0 4px; font-size: 20px; }
+  dialog p { margin: 0 0 18px; color: var(--muted); }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  input { width: 100%; font: inherit; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); margin-bottom: 14px; }
+  #code { font-size: 26px; letter-spacing: .3em; text-align: center; font-variant-numeric: tabular-nums; }
+  #join-error { color: var(--bad); min-height: 1.4em; margin: -6px 0 10px; font-size: 14px; }
+  dialog button.primary { width: 100%; padding: 11px; }
+  @media (max-width: 760px) { main { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) 200px; } aside { border-left: none; border-top: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>SideSeat</h1>
+  <span id="status" class="chip">Not connected</span>
+  <span class="spacer"></span>
+  <button id="back" disabled title="Go back on the device">Back</button>
+  <button id="end" class="danger" disabled>End session</button>
+  <button id="join-open" class="primary">Join</button>
+</header>
+<main>
+  <section id="stage">
+    <canvas id="screen" width="390" height="844" tabindex="0" aria-label="Device screen"></canvas>
+    <div id="hint">Join with the code shown on the device.</div>
+  </section>
+  <aside>
+    <h2>Activity</h2>
+    <ul id="events"></ul>
+  </aside>
+</main>
+
+<dialog id="join">
+  <form id="join-form" method="dialog">
+    <h2>Join a session</h2>
+    <p>Ask the user for the 6-digit code on their screen.</p>
+    <label for="code">Code</label>
+    <input id="code" inputmode="numeric" autocomplete="off" maxlength="7" required>
+    <label for="name">Your name</label>
+    <input id="name" autocomplete="name" maxlength="40" required>
+    <div id="join-error" role="alert"></div>
+    <button class="primary" type="submit">Join</button>
+  </form>
+</dialog>
+
+<script>
+const $ = id => document.getElementById(id)
+const canvas = $('screen'), ctx = canvas.getContext('2d')
+const reasons = {
+  viewOnly: 'Blocked: view only', noConsent: 'Blocked: not approved yet', notAvailable: 'Not available',
+  noTarget: 'Nothing to tap there', disabled: 'That control is disabled', selectionDisabled: "That list doesn't select",
+  notSelectable: "That row can't be selected", noScrollView: 'Nothing scrolls there', atEdge: 'Already at the end',
+  noFocusedField: 'Tap a text field first', cannotFocus: "That field can't be edited", alertOpen: 'An alert is open',
+  popoverStaysOpen: 'This popup stays open', backHidden: 'This screen has no Back', nothingToGoBack: 'Nothing to go back to'
+}
+let ws = null, mode = null, seq = 0, scroll = null
+const pending = new Map()
+
+function setStatus(text, tone) { $('status').textContent = text; $('status').dataset.tone = tone || '' }
+
+function addEvent(title, result, tone) {
+  const li = document.createElement('li')
+  li.innerHTML = '<span class="title"></span><span class="result"></span>'
+  li.querySelector('.title').textContent = title
+  const r = li.querySelector('.result'); r.textContent = result || ''; r.dataset.tone = tone || ''
+  $('events').prepend(li)
+  return r
+}
+
+function setMode(next) {
+  mode = next
+  canvas.classList.toggle('control', mode === 'control')
+  $('back').disabled = mode !== 'control'
+  if (mode === 'control') setStatus('Controlling', 'good')
+  else if (mode === 'view') setStatus('Viewing', 'good')
+}
+
+function connect(code, name) {
+  const scheme = location.protocol === 'https:' ? 'wss' : 'ws'
+  ws = new WebSocket(`${scheme}://${location.host}/agent?code=${encodeURIComponent(code)}&name=${encodeURIComponent(name)}`)
+  ws.binaryType = 'blob'
+  let joined = false
+  ws.onopen = () => {
+    joined = true
+    $('join').close()
+    setStatus('Waiting for approval', 'warn')
+    $('hint').textContent = 'Waiting for the user to approve…'
+    $('end').disabled = false
+    $('join-open').disabled = true
+    addEvent('Joined session ' + code)
+  }
+  ws.onmessage = async event => {
+    if (event.data instanceof Blob) {
+      const bitmap = await createImageBitmap(event.data)
+      if (canvas.width !== bitmap.width || canvas.height !== bitmap.height) { canvas.width = bitmap.width; canvas.height = bitmap.height }
+      ctx.drawImage(bitmap, 0, 0)
+      $('hint').hidden = true
+      return
+    }
+    const message = JSON.parse(event.data)
+    if (message.type === 'consent') { setMode(message.mode); addEvent('User allowed ' + (message.mode === 'control' ? 'control' : 'viewing'), '', 'good') }
+    if (message.type === 'mode') { setMode(message.mode); addEvent('User switched to view only', '', 'bad') }
+    if (message.type === 'result') {
+      const row = pending.get(message.id); pending.delete(message.id)
+      if (row) {
+        row.textContent = message.outcome === 'performed' ? 'Done' : (reasons[message.reason] || message.reason || message.outcome)
+        row.dataset.tone = message.outcome === 'performed' ? 'good' : 'bad'
+      }
+    }
+    if (message.type === 'end') addEvent('Session ended', { userEnded: 'by the user', agentEnded: 'by you', disconnected: 'connection lost' }[message.reason] || '', 'bad')
+  }
+  ws.onclose = event => {
+    if (!joined) {
+      $('join-error').textContent = event.code === 4409 ? 'Someone is already in this session.' : 'That code is not active.'
+      return
+    }
+    if (event.code === 4403) addEvent('User denied the request', '', 'bad')
+    ws = null; setMode(null)
+    setStatus('Not connected')
+    $('end').disabled = true; $('back').disabled = true; $('join-open').disabled = false
+    $('hint').hidden = false; $('hint').textContent = 'Session over. Join again with a new code.'
+  }
+}
+
+function sendInput(action, fields, label) {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return
+  const id = 'i' + (++seq)
+  ws.send(JSON.stringify({ type: 'input', id, action, ...fields }))
+  pending.set(id, addEvent(label, 'Sending…'))
+}
+
+function pointFrom(event) {
+  const r = canvas.getBoundingClientRect()
+  const clamp = v => Math.min(Math.max(v, 0), 1)
+  return { x: clamp((event.clientX - r.left) / r.width), y: clamp((event.clientY - r.top) / r.height) }
+}
+
+canvas.addEventListener('click', event => {
+  if (mode !== 'control') return
+  canvas.focus()
+  sendInput('tap', pointFrom(event), 'Tap')
+})
+
+canvas.addEventListener('wheel', event => {
+  if (mode !== 'control') return
+  event.preventDefault()
+  const r = canvas.getBoundingClientRect()
+  if (!scroll) {
+    scroll = { ...pointFrom(event), dx: 0, dy: 0 }
+    setTimeout(() => {
+      const s = scroll; scroll = null
+      const direction = Math.abs(s.dy) >= Math.abs(s.dx) ? (s.dy > 0 ? 'down' : 'up') : (s.dx > 0 ? 'right' : 'left')
+      sendInput('scroll', s, 'Scroll ' + direction)
+    }, 120)
+  }
+  scroll.dx += event.deltaX / r.width
+  scroll.dy += event.deltaY / r.height
+}, { passive: false })
+
+canvas.addEventListener('keydown', event => {
+  if (mode !== 'control' || event.metaKey || event.ctrlKey || event.altKey) return
+  if (event.key === 'Backspace') sendInput('key', { key: 'backspace' }, 'Backspace')
+  else if (event.key === 'Enter') sendInput('key', { key: 'return' }, 'Return')
+  else if (event.key.length === 1) sendInput('text', { text: event.key }, 'Type “' + event.key + '”')
+  else return
+  event.preventDefault()
+})
+
+$('back').addEventListener('click', () => sendInput('back', {}, 'Back'))
+$('end').addEventListener('click', () => { if (ws) ws.send(JSON.stringify({ type: 'end' })) })
+$('join-open').addEventListener('click', () => { $('join-error').textContent = ''; $('join').showModal(); $('code').focus() })
+$('join-form').addEventListener('submit', event => {
+  event.preventDefault()
+  const code = $('code').value.replace(/\D/g, ''), name = $('name').value.trim()
+  if (code.length !== 6) return ($('join-error').textContent = 'Enter all 6 digits.')
+  if (!name) return ($('join-error').textContent = 'Enter your name. The user sees it.')
+  try { localStorage.setItem('sideseat-name', name) } catch {}
+  $('join-error').textContent = ''
+  connect(code, name)
+})
+try { $('name').value = localStorage.getItem('sideseat-name') || '' } catch {}
+$('join').showModal()
+</script>
+</body>
+</html>
