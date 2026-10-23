@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests and sample app
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pick a simulator
+        run: |
+          id=$(xcrun simctl list devices available --json | python3 -c "import json,sys; print(next(d['udid'] for r, ds in json.load(sys.stdin)['devices'].items() if 'iOS' in r for d in ds if d['name'].startswith('iPhone')))")
+          echo "SIMULATOR=$id" >> "$GITHUB_ENV"
+
+      - name: Test SideSeat
+        run: xcodebuild test -scheme SideSeat -destination "id=$SIMULATOR" | xcbeautify || exit ${PIPESTATUS[0]}
+
+      - name: Build sample app
+        run: xcodebuild build -project Examples/SampleApp/SampleApp.xcodeproj -scheme SampleApp -destination "id=$SIMULATOR" CODE_SIGNING_ALLOWED=NO | xcbeautify || exit ${PIPESTATUS[0]}
+
+  relay:
+    name: Relay
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - working-directory: Examples/Relay
+        run: |
+          npm ci
+          node --check relay.js

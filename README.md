@@ -6,6 +6,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/mohameditani91/SideSeat/actions/workflows/ci.yml"><img src="https://github.com/mohameditani91/SideSeat/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/iOS-15%2B-blue" alt="iOS 15+">
   <img src="https://img.shields.io/badge/Swift-5.9-orange" alt="Swift 5.9">
   <img src="https://img.shields.io/badge/SPM-compatible-brightgreen" alt="Swift Package Manager">
@@ -26,6 +27,14 @@ A support agent opens a web page, types the 6-digit code shown in your app, and 
 - **Masking.** Secure text fields are always painted black. Mark anything else with one property, or mask whole screens with a rule.
 - **No dependencies.** About 2,000 lines of Swift. iOS 15+, UIKit and SwiftUI.
 - **Bring your own backend.** A small reference relay and agent console are included for local development. The transport is a protocol, so you can run sessions over your own infrastructure.
+
+## See it in action
+
+An agent opens a task, marks it done, sets the priority, types a comment and saves, all from the browser. Every input shows up in the activity log with its result.
+
+<p align="center">
+  <img src="docs/demo.gif" alt="An agent driving the sample app from the web console" width="900">
+</p>
 
 | Pairing and consent | What the user sees vs. what the agent sees |
 | :---: | :---: |
@@ -50,7 +59,7 @@ Click on the screen to tap, use the trackpad or wheel to scroll, and type with t
 Swift Package Manager: in Xcode choose **File › Add Package Dependencies…** and enter the repository URL, or add it to `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/mohameditani91/SideSeat.git", branch: "main")
+.package(url: "https://github.com/mohameditani91/SideSeat.git", from: "0.1.0")
 ```
 
 Then add the `SideSeat` product to your target.
@@ -134,6 +143,10 @@ The relay in `Examples/Relay` is a starting point for development. It has an opt
 - Each frame is drawn on the main thread with `drawHierarchy`. Frame rate drops automatically when a capture takes longer than `mainThreadBudget`. Expect 1–2 fps on the simulator.
 - The system keyboard isn't shown to the agent, and Liquid Glass and other blur materials may render without their background.
 - One agent per session. If the connection drops, the session ends and the user starts a new one.
+
+## Security
+
+To report a vulnerability, follow [SECURITY.md](SECURITY.md). Please don't open a public issue.
 
 ## License
 

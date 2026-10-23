@@ -200,6 +200,7 @@ private final class InstantPopNavigation: UINavigationController {
     @Test func scrollPrefersTheScrollViewThatCanMoveThatWayAndClamps() {
         let w = window()
         let outer = UIScrollView(frame: scene)
+        outer.contentInsetAdjustmentBehavior = .never    // the simulator's safe area would otherwise shift offsets
         outer.contentSize = CGSize(width: 1000, height: 2000)
         let inner = UIScrollView(frame: CGRect(x: 0, y: 0, width: 1000, height: 200))
         inner.contentSize = CGSize(width: 3000, height: 200)
